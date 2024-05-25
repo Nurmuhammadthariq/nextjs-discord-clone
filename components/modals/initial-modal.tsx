@@ -25,18 +25,21 @@ import {
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { FileUpload } from '@/components/file-upload'
+import { useRouter } from 'next/navigation'
 
 const formSchema = z.object({
 	name: z.string().min(1, { 
 		message: "Server name is required" 
 	}),
-	image: z.string().min(1, { 
+	imageUrl: z.string().min(1, { 
 		message: "Server image is required" 
 	}),
 })
 
 const InitialModal = () => {
 	const [isMounted, setIsMounted] = useState(false)
+
+	const router = useRouter()
 
 	useEffect(() => {
 		setIsMounted(true)
@@ -46,7 +49,7 @@ const InitialModal = () => {
 		resolver: zodResolver(formSchema),
 		defaultValues: {
 			name: "",
-			image: "",
+			imageUrl: "",
 		},
 	})
 
@@ -54,7 +57,11 @@ const InitialModal = () => {
 
 	const onSubmit = async (values: z.infer<typeof formSchema>) => {
 		try {
-			console.log(values)
+			await axios.post("/api/servers", values)
+
+			form.reset()
+			router.refresh()
+			window.location.reload()
 		} catch (error) {
 			console.log(error)
 		}
@@ -82,7 +89,7 @@ const InitialModal = () => {
 							<div className="flex items-center justify-center text-center">
 								<FormField
 									control={form.control}
-									name='image'
+									name='imageUrl'
 									render={({ field }) => (
 										<FormItem>
 											<FormControl>
